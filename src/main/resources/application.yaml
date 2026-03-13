@@ -1,10 +1,6 @@
 spring:
   application:
     name: circuit-breaker-service
-  boot:
-    admin:
-      client:
-        url: http://localhost:8080 # Point to the Dashboard
 
 server:
   port: 8081
@@ -16,7 +12,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*" # We are providing metrics for the dashboard.
+        include: health,info,metrics,circuitbreakers
   endpoint:
     health:
       show-details: always
@@ -31,7 +27,28 @@ resilience4j:
       externalApiConfig:
         baseConfig: default
         registerHealthIndicator: true
+
+        # --- Ventana deslizante ---
+        # El CircuitBreaker evalúa las últimas N llamadas para calcular la tasa de fallos
         slidingWindowSize: 5
+
+        # Mínimo de llamadas antes de que el CB pueda abrirse
+        # (evita que 1 fallo inicial abra el circuito)
         minimumNumberOfCalls: 3
+
+        # --- Transición CLOSED → OPEN ---
+        # Si el % de fallos supera este umbral, el circuito se abre
         failureRateThreshold: 50
+
+        # --- Transición OPEN → HALF_OPEN ---
+        # Tiempo que el circuito permanece abierto antes de probar recuperación
         waitDurationInOpenState: 10s
+
+        # Transición automática a HALF_OPEN sin necesidad de una llamada entrante
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+        # --- Estado HALF_OPEN ---
+        # Número de llamadas de prueba que se permiten en estado HALF_OPEN
+        # Si tienen éxito → vuelve a CLOSED. Si fallan → vuelve a OPEN.
+        permittedNumberOfCallsInHalfOpenState: 2
+
