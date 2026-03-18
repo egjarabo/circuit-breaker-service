@@ -1,6 +1,5 @@
 package com.egjarabo.circuitbreaker.service;
 
-import com.egjarabo.circuitbreaker.exception.ExternalApiException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -33,12 +32,7 @@ public class ExternalApiService {
      */
     @CircuitBreaker(name = "externalApiConfig", fallbackMethod = "fallbackResponse")
     public String callExternalApi() {
-        try {
-            return restTemplate.getForObject(targetUrl.get(), String.class);
-        } catch (Exception e) {
-            // Envolvemos en nuestra excepción de dominio para que el Circuit Breaker la contabilice
-            throw new ExternalApiException("Fallo al conectar con la API externa", e);
-        }
+        return restTemplate.getForObject(targetUrl.get(), String.class);
     }
 
     /**

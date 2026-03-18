@@ -21,8 +21,6 @@ circuitbreaker/
 │   └── RestTemplateConfig.java       # RestTemplate bean
 ├── controller/
 │   └── CircuitBreakerController.java # HTTP layer — delegates to service
-├── exception/
-│   └── ExternalApiException.java     # Domain exception
 └── service/
     └── ExternalApiService.java       # Circuit Breaker logic lives here
 ```
